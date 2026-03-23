@@ -1,19 +1,244 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <!-- DataBinding variable: vm → MainViewModel -->
+    <data>
+        <variable
+            name="vm"
+            type="com.bba.new_cyclone_club.MainViewModel" />
+    </data>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#0F1117"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:id="@+id/main"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp"
+            android:paddingBottom="40dp"
+            tools:context=".MainActivity">
+
+            <!-- ── 标题区 ── -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="52dp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.08"
+                android:text="MVVM Framework"
+                android:textColor="#E8E8FF"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="6dp"
+                android:fontFamily="monospace"
+                android:text="DataBinding · LiveData · Command · DI · Router"
+                android:textColor="#6B7280"
+                android:textSize="11sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="28dp"
+                android:background="#1E2130" />
+
+            <!-- ── 计数器卡片 ── -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/card_bg"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.2"
+                    android:text="COUNTER"
+                    android:textColor="#4F5880"
+                    android:textSize="10sp" />
+
+                <!-- 计数器数字 — 绑定 vm.counter（ObservableField<Int>）-->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="monospace"
+                    android:text="@{String.valueOf(vm.counter)}"
+                    android:textColor="#7C8FFF"
+                    android:textSize="64sp"
+                    android:textStyle="bold"
+                    tools:text="0" />
+
+                <!-- 按钮行 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <!-- +1 点击 / 长按 +10 -->
+                    <Button
+                        android:layout_width="0dp"
+                        android:layout_height="44dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:backgroundTint="#1A2240"
+                        android:fontFamily="monospace"
+                        android:text="+ 1"
+                        android:textColor="#7C8FFF"
+                        android:textSize="14sp"
+                        app:onClickCommand="@{vm.onIncrement}"
+                        app:onLongClickCommand="@{vm.onLongPress}" />
+
+                    <!-- 重置 -->
+                    <Button
+                        android:layout_width="0dp"
+                        android:layout_height="44dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:backgroundTint="#1A2240"
+                        android:fontFamily="monospace"
+                        android:text="RESET"
+                        android:textColor="#FF6B8A"
+                        android:textSize="14sp"
+                        app:onClickCommand="@{vm.onReset}" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ── 输入框卡片 ── -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/card_bg"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.2"
+                    android:text="TWO-WAY BINDING"
+                    android:textColor="#4F5880"
+                    android:textSize="10sp" />
+
+                <!-- 双向绑定 EditText — @={vm.inputText} -->
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/input_bg"
+                    android:fontFamily="monospace"
+                    android:hint="输入内容…"
+                    android:padding="12dp"
+                    android:text="@={vm.inputText}"
+                    android:textColor="#C8CAFF"
+                    android:textColorHint="#3A3F60"
+                    android:textSize="14sp"
+                    app:onTextChanged="@{vm.onTextChanged}" />
+
+                <!-- 预览：实时显示输入内容 -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="monospace"
+                    android:text='@{"→  " + vm.inputText}'
+                    android:textColor="#555E8A"
+                    android:textSize="12sp"
+                    tools:text="→  Hello" />
+            </LinearLayout>
+
+            <!-- ── 操作按钮区 ── -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/card_bg"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.2"
+                    android:text="EVENTS"
+                    android:textColor="#4F5880"
+                    android:textSize="10sp" />
+
+                <!-- Toast 命令 -->
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:layout_marginTop="12dp"
+                    android:backgroundTint="#1A2240"
+                    android:fontFamily="monospace"
+                    android:text="SingleLiveEvent  →  Toast"
+                    android:textColor="#A8FFD8"
+                    android:textSize="13sp"
+                    app:onClickCommand="@{vm.onShowToast}" />
+
+                <!-- Dialog 命令 -->
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:layout_marginTop="8dp"
+                    android:backgroundTint="#1A2240"
+                    android:fontFamily="monospace"
+                    android:text="SingleLiveEvent  →  Dialog"
+                    android:textColor="#FFD8A8"
+                    android:textSize="13sp"
+                    app:onClickCommand="@{vm.onShowDialog}" />
+
+                <!-- 路由命令 -->
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:layout_marginTop="8dp"
+                    android:backgroundTint="#1A2240"
+                    android:fontFamily="monospace"
+                    android:text="Router  →  navigate(\"detail\")"
+                    android:textColor="#D8A8FF"
+                    android:textSize="13sp"
+                    app:onClickCommand="@{vm.onNavigate}" />
+            </LinearLayout>
+
+            <!-- ── 框架说明 ── -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="28dp"
+                android:background="#1E2130" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="monospace"
+                android:lineSpacingExtra="4dp"
+                android:text="Layer         Class\n────────────  ─────────────────────\nObservable    ObservableField\u003cT\u003e\nEvent Bus     SingleLiveEvent\u003cT\u003e\nViewModel     BaseViewModel\nCommand       BindingCommand(\u003cT\u003e)\nDI            ServiceLocator + inject()\nRouter        Router.register / navigateTo\nView          BaseActivity / BaseFragment"
+                android:textColor="#3A4060"
+                android:textSize="11sp" />
+
+        </LinearLayout>
+    </ScrollView>
+</layout>
