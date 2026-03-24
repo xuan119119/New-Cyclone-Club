@@ -24,8 +24,8 @@ import kotlin.reflect.KClass
  */
 object ServiceLocator {
 
-    private val singletons = HashMap<KClass<*>, Any>()
-    private val factories  = HashMap<KClass<*>, () -> Any>()
+    val singletons = HashMap<KClass<*>, Any>()
+    val factories  = HashMap<KClass<*>, () -> Any>()
 
     // -------------------------------------------------------------------------
     // 注册 API
