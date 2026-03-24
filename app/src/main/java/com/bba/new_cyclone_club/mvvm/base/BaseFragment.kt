@@ -10,12 +10,18 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.bba.new_cyclone_club.mvvm.event.EventBus
+import com.bba.new_cyclone_club.mvvm.logger.Logger
 import com.bba.new_cyclone_club.mvvm.router.Router
 
 /**
  * MVVM 框架 Fragment 基类。
  *
  * 与 [BaseActivity] 用法对称，Fragment 中使用 [viewModel] 和 [binding]。
+ *
+ * 额外提供：
+ *  - Logger 便捷方法：[logD] / [logI] / [logW] / [logE]
+ *  - EventBus 订阅：[observeEvent] / [observeStickyEvent]
  *
  * ### 示例
  * ```kotlin
@@ -24,7 +30,10 @@ import com.bba.new_cyclone_club.mvvm.router.Router
  *     override val variableId = BR.vm
  *
  *     override fun initView() { /* 控件初始化 */ }
- *     override fun initData() { viewModel.loadProfile() }
+ *     override fun initData() {
+ *         viewModel.loadProfile()
+ *         observeEvent<RefreshEvent> { viewModel.refresh() }
+ *     }
  * }
  * ```
  *
@@ -41,6 +50,9 @@ abstract class BaseFragment<VDB : ViewDataBinding, VM : BaseViewModel> : Fragmen
 
     lateinit var viewModel: VM
         private set
+
+    /** 当前 Fragment 使用的日志 Tag，默认为类名，子类可重写。 */
+    open val logTag: String get() = this::class.java.simpleName
 
     // -------------------------------------------------------------------------
     // 生命周期
@@ -59,6 +71,7 @@ abstract class BaseFragment<VDB : ViewDataBinding, VM : BaseViewModel> : Fragmen
     @Suppress("UNCHECKED_CAST")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        logD("onViewCreated")
 
         val vmClass = resolveVMClass<VM>()
         viewModel = ViewModelProvider(this)[vmClass]
@@ -72,6 +85,7 @@ abstract class BaseFragment<VDB : ViewDataBinding, VM : BaseViewModel> : Fragmen
 
     override fun onDestroyView() {
         super.onDestroyView()
+        logD("onDestroyView")
         _binding = null
     }
 
@@ -107,6 +121,42 @@ abstract class BaseFragment<VDB : ViewDataBinding, VM : BaseViewModel> : Fragmen
 
     open fun onCustomEvent(event: UIEvent.Custom) = Unit
     open fun onLoadingChanged(show: Boolean) = Unit
+
+    // -------------------------------------------------------------------------
+    // EventBus 便捷方法
+    // -------------------------------------------------------------------------
+
+    /**
+     * 订阅全局普通事件，自动跟随 Fragment viewLifecycleOwner，无需手动取消。
+     *
+     * ```kotlin
+     * observeEvent<RefreshEvent> { viewModel.refresh() }
+     * ```
+     */
+    protected inline fun <reified T : Any> observeEvent(noinline observer: (T) -> Unit) {
+        EventBus.observe<T>(viewLifecycleOwner, observer)
+    }
+
+    /**
+     * 订阅全局粘性事件，自动跟随 Fragment viewLifecycleOwner。
+     *
+     * ```kotlin
+     * observeStickyEvent<NetworkStatusEvent> { updateBanner(it.online) }
+     * ```
+     */
+    protected inline fun <reified T : Any> observeStickyEvent(noinline observer: (T) -> Unit) {
+        EventBus.observeSticky<T>(viewLifecycleOwner, observer)
+    }
+
+    // -------------------------------------------------------------------------
+    // Logger 便捷方法
+    // -------------------------------------------------------------------------
+
+    protected fun logV(msg: String) = Logger.v(msg, logTag)
+    protected fun logD(msg: String) = Logger.d(msg, logTag)
+    protected fun logI(msg: String) = Logger.i(msg, logTag)
+    protected fun logW(msg: String, throwable: Throwable? = null) = Logger.w(msg, logTag, throwable)
+    protected fun logE(msg: String, throwable: Throwable? = null) = Logger.e(msg, logTag, throwable)
 
     // -------------------------------------------------------------------------
     // 工具
